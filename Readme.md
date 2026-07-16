@@ -79,8 +79,3 @@ https://cdn3.example.com/file3.rar
 - The script uses relative requests, so it must be executed from a FuckingFast page.
 - A 1-second delay is included between requests to avoid sending them too quickly.
 - Failed requests are reported in the browser console without stopping the extraction.
-
-## License
-
-MIT
-```
