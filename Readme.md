@@ -13,45 +13,37 @@ The script sends the required POST request for each shared file, extracts the `h
 - Automatically downloads the results as `Out_Direct_Links.txt`
 - No external dependencies
 
+## Requirements
+
+This repository contains two scripts:
+
+- **fitgirl-extract.js** - Extracts all FuckingFast links from a FitGirl repack page.
+- **extract-direct.js** - Converts those links into direct download URLs.
+
 ## Usage
 
-### 1. Edit the Links
+### Step 1 - Extract the FuckingFast Links
 
-Replace the contents of the `links` array with your own FuckingFast URLs.
+1. Open the desired **FitGirl** game page.
+2. Open **Developer Tools** (`F12`).
+3. Go to the **Console** tab.
+4. Paste and run **`fitgirl-extract.js`**.
+5. Copy the generated `links` array.
 
-```js
-const links = [
-    "https://fuckingfast.co/xxxxxxxx",
-    "https://fuckingfast.co/yyyyyyyy",
-];
-```
+### Step 2 - Extract Direct Download Links
 
-### 2. Open the Website
-
-Open any FuckingFast page while logged in (if required).
-
-### 3. Open Developer Tools
-
-Press:
-
-```
-F12
-```
-
-Go to the **Console** tab.
-
-### 4. Paste the Script
-
-Paste the entire script into the console and press **Enter**.
-
-### 5. Wait
+1. Open **the first FuckingFast URL** from the extracted array.
+2. Open **Developer Tools** (`F12`) and switch to the **Console**.
+3. Open **`extract-direct.js`**.
+4. Replace the `links` array with the one copied from the previous step.
+5. Paste the entire script into the console and press **Enter**.
 
 The script will:
 
 - Process every link
 - Print progress in the console
-- Collect every direct download URL
-- Automatically download:
+- Extract the direct download URL from each page
+- Automatically download the results as:
 
 ```
 Out_Direct_Links.txt
@@ -69,8 +61,8 @@ For every link, the script:
 ```
 
 3. Reads the `hx-redirect` response header.
-4. Stores the direct URL.
-5. Repeats until all links are processed.
+4. Stores the direct download URL.
+5. Repeats until every link has been processed.
 
 ## Example Output
 
@@ -82,10 +74,13 @@ https://cdn3.example.com/file3.rar
 
 ## Notes
 
-- Run the script from a FuckingFast page so relative requests work correctly.
-- A one-second delay is included to reduce request spam.
+- Run **`fitgirl-extract.js`** only on a FitGirl game page.
+- Run **`extract-direct.js`** only after opening the **first FuckingFast link** in your browser.
+- The script uses relative requests, so it must be executed from a FuckingFast page.
+- A 1-second delay is included between requests to avoid sending them too quickly.
 - Failed requests are reported in the browser console without stopping the extraction.
 
 ## License
 
 MIT
+```
