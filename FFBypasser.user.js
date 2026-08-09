@@ -521,6 +521,8 @@ function panelViewModel(job, role = 'collector', message = '') {
   let currentItemLabel = '';
   if (currentItem) {
     try { currentItemLabel = fileIdOf(currentItem.link); } catch { currentItemLabel = currentItem.link; }
+  } else if (role === 'collector' && summary.done && summary.failed === 0) {
+    currentItemLabel = 'Ready to download';
   }
   const isActive = Boolean(job && (summary.processing || summary.queued));
   const phase = job
@@ -542,12 +544,13 @@ function renderPanelMarkup(view) {
   const { job, role, summary, percent, message, statusKind, statusLabel, currentItemLabel, isActive } = view;
   const actions = [];
   if (!job && role === 'collector') actions.push('<button class="primary-start" data-action="start">Extract Direct Links</button>');
-  if (job && summary.succeeded) {
+  if (role === 'collector' && job && summary.succeeded) {
     actions.push('<button data-action="copy">Copy</button>');
     actions.push('<button data-action="download">Download TXT</button>');
   }
-  if (job && summary.failed) actions.push('<button data-action="retry">Retry failed</button>');
-  if (job) actions.push('<button class="muted" data-action="clear">Clear</button>');
+  if (role === 'worker' && job && summary.failed) actions.push('<button data-action="retry">Retry failed</button>');
+  if (role === 'collector' && job) actions.push('<button class="muted" data-action="clear">Clear</button>');
+  const actionsMarkup = actions.length ? `<div class="actions">${actions.join('')}</div>` : '';
   const header = `
     <header>
       <div class="brand-block">
@@ -568,7 +571,7 @@ function renderPanelMarkup(view) {
         <h2>Direct links in one pass</h2>
         <p class="helper">Collect FuckingFast links and process them automatically in a dedicated worker tab.</p>
         ${message ? `<div class="message">${escapeHtml(message)}</div>` : ''}
-        <div class="actions">${actions.join('')}</div>
+        ${actionsMarkup}
       </main>
     </div>`;
   }
@@ -596,7 +599,7 @@ function renderPanelMarkup(view) {
         <div class="bad"><span>Failed</span><strong>${summary.failed}</strong></div>
       </div>
       ${message ? `<div class="message">${escapeHtml(message)}</div>` : ''}
-      <div class="actions">${actions.join('')}</div>
+      ${actionsMarkup}
     </main>
   </div>`;
 }

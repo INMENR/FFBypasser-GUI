@@ -74,13 +74,35 @@ test('panel CSS includes activity motion and reduced-motion fallback', () => {
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
 });
 
-test('successful worker view keeps result actions and completion state', () => {
+test('successful worker view hides all result actions', () => {
   let job = api.createJob(['https://fuckingfast.co/f/a'], 'x', 1);
   job = api.transitionItem(job, 0, { state: 'succeeded', directUrl: 'https://cdn/a' });
   const html = api.renderPanelMarkup(api.panelViewModel(job, 'worker'));
   assert.match(html, /status-success/);
   assert.match(html, /Complete/);
-  assert.match(html, /Copy/);
+  assert.doesNotMatch(html, />Copy</);
+  assert.doesNotMatch(html, /Download TXT/);
+  assert.doesNotMatch(html, />Clear</);
+});
+
+test('failed worker view keeps retry but hides result actions', () => {
+  let job = api.createJob(['https://fuckingfast.co/f/a', 'https://fuckingfast.co/f/b'], 'x', 1);
+  job = api.transitionItem(job, 0, { state: 'succeeded', directUrl: 'https://cdn/a' });
+  job = api.transitionItem(job, 1, { state: 'failed', error: 'HTTP 500' });
+  const html = api.renderPanelMarkup(api.panelViewModel(job, 'worker'));
+  assert.match(html, /Retry failed/);
+  assert.doesNotMatch(html, />Copy</);
+  assert.doesNotMatch(html, /Download TXT/);
+  assert.doesNotMatch(html, />Clear</);
+});
+
+test('completed collector view directs the user to download', () => {
+  let job = api.createJob(['https://fuckingfast.co/f/a'], 'x', 1);
+  job = api.transitionItem(job, 0, { state: 'succeeded', directUrl: 'https://cdn/a' });
+  const html = api.renderPanelMarkup(api.panelViewModel(job, 'collector'));
+  assert.match(html, /Ready to download/);
+  assert.match(html, />Copy</);
   assert.match(html, /Download TXT/);
+  assert.match(html, />Clear</);
 });
 
