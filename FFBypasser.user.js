@@ -114,6 +114,20 @@ function summarizeJob(job) {
   return summary;
 }
 
+function shouldCloseWorker(job) {
+  const summary = summarizeJob(job);
+  return summary.done && summary.succeeded === summary.total && summary.failed === 0;
+}
+
+function handoffCompletedWorker(job, panel, environment = {}) {
+  if (!shouldCloseWorker(job)) return false;
+  const closeTab = environment.closeTab || (() => window.close());
+  const schedule = environment.schedule || setTimeout;
+  panel.render(job, 'Returning to FitGirl...');
+  schedule(closeTab, 700);
+  return true;
+}
+
 function createLease(owner, now = Date.now(), ttlMs = CONFIG.leaseTtlMs) {
   return { owner, expiresAt: now + ttlMs };
 }
@@ -776,7 +790,9 @@ async function bootstrap() {
     running = true;
     try {
       await runWorker(store, owner, nextJob => panel.render(nextJob));
-      panel.render(await store.loadJob());
+      const latest = await store.loadJob();
+      panel.render(latest);
+      handoffCompletedWorker(latest, panel);
     } catch (error) {
       panel.render(await store.loadJob(), error.message);
     } finally {
@@ -796,6 +812,8 @@ const TEST_API = {
   transitionItem,
   retryFailed,
   summarizeJob,
+  shouldCloseWorker,
+  handoffCompletedWorker,
   createLease,
   canAcquireLease,
   buildRequestDescriptor,

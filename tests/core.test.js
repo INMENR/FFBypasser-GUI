@@ -148,3 +148,28 @@ test('download action uses the panel cached job without yielding user activation
 test('background lease renewal accepts synchronous Violentmonkey storage results', () => {
   assert.doesNotThrow(() => api.ignorePromiseResult(undefined));
 });
+
+test('worker closes only after every item succeeds', () => {
+  let success = api.createJob(['https://fuckingfast.co/f/a'], 'x', 1);
+  success = api.transitionItem(success, 0, { state: 'succeeded', directUrl: 'https://cdn/a' });
+  let partial = api.createJob(['https://fuckingfast.co/f/a'], 'x', 1);
+  partial = api.transitionItem(partial, 0, { state: 'failed', error: 'HTTP 500' });
+  assert.equal(api.shouldCloseWorker(success), true);
+  assert.equal(api.shouldCloseWorker(partial), false);
+  assert.equal(api.shouldCloseWorker(null), false);
+});
+
+test('successful worker handoff renders guidance before closing', () => {
+  let job = api.createJob(['https://fuckingfast.co/f/a'], 'x', 1);
+  job = api.transitionItem(job, 0, { state: 'succeeded', directUrl: 'https://cdn/a' });
+  let message = '';
+  let closed = false;
+  const panel = { render: (_job, nextMessage) => { message = nextMessage; } };
+  const handled = api.handoffCompletedWorker(job, panel, {
+    closeTab: () => { closed = true; },
+    schedule: callback => callback()
+  });
+  assert.equal(handled, true);
+  assert.equal(message, 'Returning to FitGirl...');
+  assert.equal(closed, true);
+});
