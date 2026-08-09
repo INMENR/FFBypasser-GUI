@@ -5,8 +5,8 @@ FFBypasser GUI is a Violentmonkey userscript that collects FuckingFast links fro
 # Developer
 
 All source code was written by [cdxud](https://github.com/cdxud), to whom we extend our gratitude.
-[Source Code](https://github.com/cdxud/FFBypasser)
-and with my bestfriend Codex :)
+[Source Code](https://github.com/cdxud/FFBypasser).
+and Gui is coded with my bestfriend Codex :).
 
 ## Install
 
