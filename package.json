@@ -1,0 +1,7 @@
+{
+  "name": "ffbypasser-gui",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}
