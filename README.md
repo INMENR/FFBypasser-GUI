@@ -22,9 +22,10 @@ Direct userscript URL:
 2. Press **Extract Direct Links** in the floating panel.
 3. Leave the FuckingFast worker tab open while the HUD processes the queue.
 4. Complete a visible Cloudflare or CAPTCHA challenge if the host requests one.
-5. Use **Copy** or **Download TXT** when results are available.
+5. After every link succeeds, the worker tab closes and returns you to FitGirl.
+6. Use **Copy** or **Download TXT** in the completed FitGirl HUD.
 
-The worker HUD displays the current item, completed percentage, queued count, successful count, and failed count. Failed items can be queued again without losing successful results. Jobs survive supported-page reloads.
+The worker HUD displays progress only; result actions are never shown on FuckingFast. Failed items keep the worker tab open and can be queued again without losing successful results. Jobs survive supported-page reloads.
 
 ## Development
 

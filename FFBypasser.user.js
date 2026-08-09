@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FFBypasser for Violentmonkey
 // @namespace    local.ffbypasser
-// @version      1.0.3
+// @version      1.0.4
 // @updateURL    https://inmenr.github.io/FFBypasser-GUI/FFBypasser.user.js
 // @downloadURL  https://inmenr.github.io/FFBypasser-GUI/FFBypasser.user.js
 // @description  Collect and resolve FuckingFast links from FitGirl pages.
