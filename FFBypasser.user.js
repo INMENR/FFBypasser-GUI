@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FFBypasser for Violentmonkey
 // @namespace    local.ffbypasser
-// @version      1.0.1
+// @version      1.0.2
 // @updateURL    https://inmenr.github.io/FFBypasser-GUI/FFBypasser.user.js
 // @downloadURL  https://inmenr.github.io/FFBypasser-GUI/FFBypasser.user.js
 // @description  Collect and resolve FuckingFast links from FitGirl pages.
@@ -15,7 +15,6 @@
 // @grant        GM_addValueChangeListener
 // @grant        GM_openInTab
 // @grant        GM_setClipboard
-// @grant        GM_download
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -672,25 +671,33 @@ function createBrowserGm() {
     deleteValue: key => GM_deleteValue(key),
     addValueChangeListener: (key, callback) => GM_addValueChangeListener(key, callback),
     openInTab: (url, options) => GM_openInTab(url, options),
-    setClipboard: text => GM_setClipboard(text),
-    download: options => GM_download(options)
+    setClipboard: text => GM_setClipboard(text)
   };
 }
 
-async function downloadResults(job, gm) {
-  const text = formatSuccessfulResults(job);
-  if (!text) throw new Error('No successful links to download');
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+function triggerTextDownload(text, environment = {}) {
+  const doc = environment.document || document;
+  const urlApi = environment.URL || URL;
+  const BlobType = environment.Blob || Blob;
+  const schedule = environment.schedule || setTimeout;
+  const url = urlApi.createObjectURL(new BlobType([text], { type: 'text/plain;charset=utf-8' }));
+  const anchor = doc.createElement('a');
+  anchor.href = url;
+  anchor.download = 'Out_Direct_Links.txt';
+  doc.body.appendChild(anchor);
   try {
-    await gm.download({ url, name: 'Out_Direct_Links.txt', saveAs: true });
-  } catch {
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'Out_Direct_Links.txt';
     anchor.click();
   } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    anchor.remove();
+    schedule(() => urlApi.revokeObjectURL(url), 1000);
   }
+  return url;
+}
+
+function downloadResults(job, environment) {
+  const text = formatSuccessfulResults(job);
+  if (!text) throw new Error('No successful links to download');
+  return triggerTextDownload(text, environment);
 }
 
 async function startCollector(panel, store, gm) {
@@ -717,7 +724,7 @@ function bindCommonActions(panel, store, gm, role, startWorker) {
   panel.on('download', async () => {
     const job = await store.loadJob();
     try {
-      await downloadResults(job, gm);
+      downloadResults(job);
       panel.render(job, 'TXT download started.');
     } catch (error) {
       panel.render(job, error.message);
@@ -790,6 +797,7 @@ const TEST_API = {
   formatSuccessfulResults,
   createStore,
   runPool,
+  triggerTextDownload,
   routeForHostname,
   panelViewModel,
   renderPanelMarkup,
@@ -802,4 +810,3 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
   bootstrap().catch(error => console.error('[FFBypasser]', error));
 }
-

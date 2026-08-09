@@ -91,3 +91,39 @@ test('pool preserves result order while bounding concurrency', async () => {
   assert.equal(peak, 2);
 });
 
+test('text download clicks an attached anchor and revokes its Blob URL', () => {
+  let clicked = false;
+  let revoked = null;
+  const anchor = {
+    isConnected: false,
+    click() {
+      assert.equal(this.isConnected, true);
+      clicked = true;
+    },
+    remove() { this.isConnected = false; }
+  };
+  const environment = {
+    document: {
+      createElement: tag => {
+        assert.equal(tag, 'a');
+        return anchor;
+      },
+      body: {
+        appendChild: node => { node.isConnected = true; }
+      }
+    },
+    URL: {
+      createObjectURL: () => 'blob:direct-links',
+      revokeObjectURL: url => { revoked = url; }
+    },
+    Blob: class FakeBlob {},
+    schedule: callback => callback()
+  };
+
+  api.triggerTextDownload('https://cdn/a', environment);
+
+  assert.equal(clicked, true);
+  assert.equal(anchor.href, 'blob:direct-links');
+  assert.equal(anchor.download, 'Out_Direct_Links.txt');
+  assert.equal(revoked, 'blob:direct-links');
+});
