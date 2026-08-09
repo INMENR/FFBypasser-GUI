@@ -13,3 +13,10 @@ test('userscript exposes stable Pages update metadata', () => {
   assert.match(source, new RegExp(`^// @updateURL\\s+${url.replaceAll('.', '\\.')}$`, 'm'));
   assert.match(source, new RegExp(`^// @downloadURL\\s+${url.replaceAll('.', '\\.')}$`, 'm'));
 });
+
+test('landing page links directly to the userscript', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.match(html, /href="\.\/FFBypasser\.user\.js"/);
+  assert.match(html, />Install with Violentmonkey</);
+  assert.doesNotMatch(html, /[\uac00-\ud7a3]/);
+});
