@@ -3,6 +3,7 @@
 FFBypasser GUI is a Violentmonkey userscript that collects FuckingFast links from supported FitGirl pages, processes them in a persistent worker tab, and exports the resolved direct URLs.
 
 # Developer
+
 All source code was written by [cdxud](https://github.com/cdxud), to whom we extend our gratitude.
 [Source Code](https://github.com/cdxud/FFBypasser)
 and with my bestfriend Codex :)
