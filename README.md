@@ -22,12 +22,6 @@ Direct userscript URL:
 
 The worker HUD displays the current item, completed percentage, queued count, successful count, and failed count. Failed items can be queued again without losing successful results. Jobs survive supported-page reloads.
 
-## Automatic updates
-
-The userscript includes stable `@updateURL` and `@downloadURL` metadata. Violentmonkey compares the installed `@version` with the published file and downloads a newer release when available.
-
-Every published behavior change must increment the metadata version in `FFBypasser.user.js` before pushing to `main`.
-
 ## Development
 
 No external packages are required.
