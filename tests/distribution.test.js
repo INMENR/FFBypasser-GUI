@@ -18,5 +18,8 @@ test('landing page links directly to the userscript', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   assert.match(html, /href="\.\/FFBypasser\.user\.js"/);
   assert.match(html, />Install with Violentmonkey</);
+  assert.match(html, /href="https:\/\/github\.com\/cdxud">cdxud<\/a>/);
+  assert.match(html, /href="https:\/\/github\.com\/cdxud\/FFBypasser">Original source<\/a>/);
+  assert.match(html, /href="https:\/\/github\.com\/INMENR\/FFBypasser-GUI">View source<\/a>/);
   assert.doesNotMatch(html, /[\uac00-\ud7a3]/);
 });
