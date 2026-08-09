@@ -91,9 +91,8 @@ test('pool preserves result order while bounding concurrency', async () => {
   assert.equal(peak, 2);
 });
 
-test('text download clicks an attached anchor and revokes its Blob URL', () => {
+test('text download synchronously clicks an attached anchor with a data URL', () => {
   let clicked = false;
-  let revoked = null;
   const anchor = {
     isConnected: false,
     click() {
@@ -111,19 +110,41 @@ test('text download clicks an attached anchor and revokes its Blob URL', () => {
       body: {
         appendChild: node => { node.isConnected = true; }
       }
-    },
-    URL: {
-      createObjectURL: () => 'blob:direct-links',
-      revokeObjectURL: url => { revoked = url; }
-    },
-    Blob: class FakeBlob {},
-    schedule: callback => callback()
+    }
   };
 
-  api.triggerTextDownload('https://cdn/a', environment);
+  api.triggerTextDownload('https://cdn/a?x=1&y=2', environment);
 
   assert.equal(clicked, true);
-  assert.equal(anchor.href, 'blob:direct-links');
+  assert.equal(anchor.href, 'data:text/plain;charset=utf-8,https%3A%2F%2Fcdn%2Fa%3Fx%3D1%26y%3D2');
   assert.equal(anchor.download, 'Out_Direct_Links.txt');
-  assert.equal(revoked, 'blob:direct-links');
+});
+
+test('download action uses the panel cached job without yielding user activation', () => {
+  let job = api.createJob(['https://fuckingfast.co/f/a'], 'x', 1);
+  job = api.transitionItem(job, 0, { state: 'succeeded', directUrl: 'https://cdn/a' });
+  let renderedMessage = '';
+  let clicked = false;
+  const anchor = {
+    click: () => { clicked = true; },
+    remove: () => {}
+  };
+  const panel = {
+    currentJob: () => job,
+    render: (_job, message) => { renderedMessage = message; }
+  };
+
+  api.downloadPanelResults(panel, {
+    document: {
+      createElement: () => anchor,
+      body: { appendChild: () => {} }
+    }
+  });
+
+  assert.equal(clicked, true);
+  assert.equal(renderedMessage, 'TXT download started.');
+});
+
+test('background lease renewal accepts synchronous Violentmonkey storage results', () => {
+  assert.doesNotThrow(() => api.ignorePromiseResult(undefined));
 });
